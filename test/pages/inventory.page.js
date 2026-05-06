@@ -1,9 +1,7 @@
-import BasePage from './base.page.js';
+import basePage from './base.page.js';
 
-class InventoryPage extends BasePage {
+class inventoryPage extends basePage {
     get inventoryContainer() { return $('.inventory_list'); }
-    get items() { return $$('.inventory_item'); }
-
     get cartIcon() { return $('.shopping_cart_link'); }
     get cartBadge() { return $('.shopping_cart_badge'); }
 
@@ -12,24 +10,16 @@ class InventoryPage extends BasePage {
 
     get sortDropdown() { return $('.product_sort_container'); }
 
-    get footerTwitter() { return $('.social_twitter'); }
-    get footerFacebook() { return $('.social_facebook'); }
-    get footerLinkedin() { return $('.social_linkedin'); }
-
-    async isPageOpened() {
-        return await this.isDisplayed(this.inventoryContainer);
+    get socialLinks() {
+        return {
+            twitter: $('.social_twitter'),
+            facebook: $('.social_facebook'),
+            linkedin: $('.social_linkedin')
+        };
     }
 
     async addFirstItemToCart() {
-        const btn = await $('.inventory_item button');
-        await this.click(btn);
-    }
-
-    async getCartCount() {
-        if (await this.cartBadge.isExisting()) {
-            return await this.cartBadge.getText();
-        }
-        return '0';
+        await this.click($('.inventory_item button'));
     }
 
     async openCart() {
@@ -49,37 +39,29 @@ class InventoryPage extends BasePage {
     async getItemNames() {
         const elements = await $$('.inventory_item_name');
         const result = [];
-
-        for (const el of elements) {
-            result.push(await el.getText());
-        }
-
+        for (const el of elements) result.push(await el.getText());
         return result;
     }
 
     async getItemPrices() {
         const elements = await $$('.inventory_item_price');
         const result = [];
-
         for (const el of elements) {
             const text = await el.getText();
             result.push(parseFloat(text.replace('$', '')));
         }
-
         return result;
     }
 
-    async clickTwitter() {
-        await this.click(this.footerTwitter);
-    }
+    async openSocialLink(name) {
+        const initial = await browser.getWindowHandles();
 
-    async clickFacebook() {
-        await this.click(this.footerFacebook);
-    }
+        await this.click(this.socialLinks[name]);
 
-    async clickLinkedin() {
-        await this.click(this.footerLinkedin);
+        const updated = await browser.getWindowHandles();
+
+        return updated.length > initial.length;
     }
 }
 
-export default new InventoryPage();
+export default new inventoryPage();

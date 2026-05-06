@@ -1,6 +1,6 @@
-import BasePage from './base.page.js';
+import basePage from './base.page.js';
 
-class LoginPage extends BasePage {
+class loginPage extends basePage {
     get username() { return $('#user-name'); }
     get password() { return $('#password'); }
     get loginBtn() { return $('#login-button'); }
@@ -43,4 +43,4 @@ class LoginPage extends BasePage {
     }
 }
 
-export default new LoginPage();
+export default new loginPage();

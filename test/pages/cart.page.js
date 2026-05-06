@@ -1,6 +1,6 @@
-import BasePage from './base.page.js';
+import basePage from './base.page.js';
 
-class CartPage extends BasePage {
+class cartPage extends basePage {
     get cartItems() { return $$('.cart_item'); }
     get checkoutBtn() { return $('#checkout'); }
 
@@ -17,4 +17,4 @@ class CartPage extends BasePage {
     }
 }
 
-export default new CartPage();
+export default new cartPage();

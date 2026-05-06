@@ -1,4 +1,4 @@
-export default class BasePage {
+export default class basePage {
     async open(path = '') {
         await browser.url(path);
     }

@@ -1,6 +1,6 @@
-import BasePage from './base.page.js';
+import basePage from './base.page.js';
 
-class CheckoutPage extends BasePage {
+class checkoutPage extends basePage {
     get firstName() { return $('#first-name'); }
     get lastName() { return $('#last-name'); }
     get postalCode() { return $('#postal-code'); }
@@ -39,4 +39,4 @@ class CheckoutPage extends BasePage {
     }
 }
 
-export default new CheckoutPage();
+export default new checkoutPage();

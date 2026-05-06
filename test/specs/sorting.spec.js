@@ -1,89 +1,32 @@
-import LoginPage from '../pages/login.page.js';
-import InventoryPage from '../pages/inventory.page.js';
-import { step } from '../utils/allure.steps.js';
-import { feature, story, severity } from '../utils/allure.meta.js';
+import loginPage from '../pages/login.page.js';
+import inventoryPage from '../pages/inventory.page.js';
 
 describe('Sorting Feature', () => {
 
-    beforeEach(async () => {
+    const cases = [
+        { name: 'price low to high', value: 'lohi', compare: (a,b) => a - b, type: 'price' },
+        { name: 'price high to low', value: 'hilo', compare: (a,b) => b - a, type: 'price' },
+        { name: 'name A-Z', value: 'az', compare: undefined, type: 'name' },
+        { name: 'name Z-A', value: 'za', compare: undefined, type: 'name', reverse: true }
+    ];
 
-        feature('Sorting');
-        severity('normal');
+    cases.forEach(tc => {
 
-        await step('Open login page', async () => {
-            await LoginPage.open();
-        });
+        it(`TC6: ${tc.name}`, async () => {
+            await loginPage.open();
+            await loginPage.login('standard_user', 'secret_sauce');
 
-        await step('Login with valid user', async () => {
-            await LoginPage.login('standard_user', 'secret_sauce');
-        });
+            await inventoryPage.sortBy(tc.value);
 
-    });
+            let data = tc.type === 'price'
+                ? await inventoryPage.getItemPrices()
+                : await inventoryPage.getItemNames();
 
-    it('TC6: Sort by price low to high', async () => {
+            let sorted = [...data].sort(tc.compare);
 
-        story('Sort by price (low to high)');
+            if (tc.reverse) sorted.reverse();
 
-        await step('Apply LOHI sorting', async () => {
-            await InventoryPage.sortBy('lohi');
-        });
-
-        await step('Validate price order ascending', async () => {
-            const prices = await InventoryPage.getItemPrices();
-            const sorted = [...prices].sort((a, b) => a - b);
-
-            expect(prices).toEqual(sorted);
-        });
-
-    });
-
-    it('TC6: Sort by price high to low', async () => {
-
-        story('Sort by price (high to low)');
-
-        await step('Apply HILO sorting', async () => {
-            await InventoryPage.sortBy('hilo');
-        });
-
-        await step('Validate price order descending', async () => {
-            const prices = await InventoryPage.getItemPrices();
-            const sorted = [...prices].sort((a, b) => b - a);
-
-            expect(prices).toEqual(sorted);
-        });
-
-    });
-
-    it('TC6: Sort by name A-Z', async () => {
-
-        story('Sort by name A-Z');
-
-        await step('Apply AZ sorting', async () => {
-            await InventoryPage.sortBy('az');
-        });
-
-        await step('Validate alphabetical order', async () => {
-            const names = await InventoryPage.getItemNames();
-            const sorted = [...names].sort();
-
-            expect(names).toEqual(sorted);
-        });
-
-    });
-
-    it('TC6: Sort by name Z-A', async () => {
-
-        story('Sort by name Z-A');
-
-        await step('Apply ZA sorting', async () => {
-            await InventoryPage.sortBy('za');
-        });
-
-        await step('Validate reverse alphabetical order', async () => {
-            const names = await InventoryPage.getItemNames();
-            const sorted = [...names].sort().reverse();
-
-            expect(names).toEqual(sorted);
+            expect(data).toEqual(sorted);
         });
 
     });

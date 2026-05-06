@@ -2,8 +2,6 @@ import LoginPage from '../pages/login.page.js';
 import InventoryPage from '../pages/inventory.page.js';
 import CartPage from '../pages/cart.page.js';
 import CheckoutPage from '../pages/checkout.page.js';
-
-import { step } from '../utils/allure.steps.js';
 import { feature, story, severity } from '../utils/allure.meta.js';
 
 describe('Checkout Feature', () => {
@@ -14,79 +12,38 @@ describe('Checkout Feature', () => {
         story('Valid checkout flow');
         severity('critical');
 
-        await step('Open login page', async () => {
-            await LoginPage.open();
-        });
+        await LoginPage.open();
+        await LoginPage.login('standard_user', 'secret_sauce');
 
-        await step('Login with valid user', async () => {
-            await LoginPage.login('standard_user', 'secret_sauce');
-        });
+        await InventoryPage.addFirstItemToCart();
+        await InventoryPage.openCart();
 
-        await step('Add product to cart', async () => {
-            await InventoryPage.addFirstItemToCart();
-        });
-
-        await step('Open cart', async () => {
-            await InventoryPage.openCart();
-        });
-
-        await step('Start checkout process', async () => {
-            await CartPage.startCheckout();
-        });
-
-        await step('Fill checkout form', async () => {
-            await CheckoutPage.fillForm('Test', 'User', '12345');
-        });
-
-        await step('Continue to overview', async () => {
-            await CheckoutPage.continue();
-        });
-
-        await step('Verify overview page is displayed', async () => {
-            await expect(CheckoutPage.overviewContainer).toBeDisplayed();
-        });
-
-        await step('Finish order', async () => {
-            await CheckoutPage.finish();
-        });
-
-        await step('Verify success message', async () => {
-            await expect(CheckoutPage.successMessage)
+        await CartPage.startCheckout();
+        
+        await CheckoutPage.fillForm('Test', 'User', '12345');
+        await CheckoutPage.continue();
+        
+        await expect(CheckoutPage.overviewContainer).toBeDisplayed();
+        
+        await CheckoutPage.finish();
+        
+        await expect(CheckoutPage.successMessage)
                 .toHaveText(expect.stringContaining('Thank you'));
-        });
-
-        await step('Return to home page', async () => {
-            await CheckoutPage.backHome();
-        });
-
-        await step('Verify inventory page is visible', async () => {
-            await expect(InventoryPage.inventoryContainer).toBeDisplayed();
-        });
+     
+        await CheckoutPage.backHome();
+      
+        await expect(InventoryPage.inventoryContainer).toBeDisplayed();
 
     });
 
     it('TC9: Checkout without products', async () => {
+            await loginPage.open();
+            await loginPage.login('standard_user', 'secret_sauce');
 
-        feature('Checkout');
-        story('Empty cart checkout');
-        severity('minor');
+            await inventoryPage.openCart();
+            await cartPage.startCheckout();
 
-        await step('Open login page', async () => {
-            await LoginPage.open();
-        });
-
-        await step('Login with valid user', async () => {
-            await LoginPage.login('standard_user', 'secret_sauce');
-        });
-
-        await step('Open cart', async () => {
-            await InventoryPage.openCart();
-        });
-
-        await step('Verify cart is empty', async () => {
-            expect(await CartPage.getItemsCount()).toBe(0);
-        });
-
-    });
-
+            await expect($('.error-message-container'))
+                .toBeDisplayed();
+    });     
 });
